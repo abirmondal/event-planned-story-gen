@@ -7,7 +7,7 @@ This module provides the EventExtractor class, which is responsible for extracti
 import re
 import spacy
 import pandas as pd
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 from config.dir import ROCSTORIES_DIR
 import config.event_tags as event_tags
 import config.event_special_tokens as event_special_tokens
@@ -147,6 +147,8 @@ class EventExtractor:
         Extract events from a DataFrame containing story texts.
 
         :param df: A pandas DataFrame with a column 'target' containing story texts.
+        :param df_type: The type of DataFrame (e.g., 'train', 'test', 'val').
+        :param is_save: Whether to save the extracted events to a file.
         """
         for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Extracting events"):
             story = row['target']
