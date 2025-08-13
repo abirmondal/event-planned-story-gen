@@ -143,7 +143,7 @@ class EventExtractor:
 
         return events
     
-    def __format_events(events_list):
+    def __format_events(self, events_list):
         if not events_list:
             return ""  # Return empty string if no events were found for a story
         return (event_special_tokens.EVENT_START + " " +
