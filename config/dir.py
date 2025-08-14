@@ -18,7 +18,7 @@ PROCESSED_DATA_DIR = DATA_DIR / "processed"
 # Directory for raw data files
 RAW_DATA_DIR = DATA_DIR / "raw"
 # Directory for graph data files
-GRAPH_DATA_DIR = DATA_DIR / "graph"
+GRAPH_DIR = DATA_DIR / "graph"
 
 def update_directories(base_dir: str):
     """
