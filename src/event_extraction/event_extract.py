@@ -7,7 +7,7 @@ This module provides the EventExtractor class, which is responsible for extracti
 import re
 import spacy
 import pandas as pd
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 from collections import defaultdict
 from config.dir import ROCSTORIES_DIR
 import config.event_tags as event_tags
