@@ -150,14 +150,20 @@ class EventExtractor:
                 (" " + event_special_tokens.EVENT_SEPERATOR + " ").join(str(event) for event in events_list) +
                 " " + event_special_tokens.EVENT_END)
 
-    def extract_events_from_story_df(self, df: pd.DataFrame, df_type: str, batch_size: int = 256, is_save: bool = True) -> None:
+    def extract_events_from_story_df(self, df: pd.DataFrame, df_type: str, batch_size: int = 256, is_save: bool = True, file_name: str = None) -> None:
         """
         Extracts events from a DataFrame by processing all stories in a single, optimized batch.
 
         :param df: A pandas DataFrame with a column 'target' containing story texts.
         :param df_type: The type of DataFrame (e.g., 'train', 'test', 'val').
+        :param batch_size: The batch size for processing sentences with spaCy's nlp.pipe.
         :param is_save: Whether to save the extracted events to a file.
+        :param file_name: The name of the file to save the extracted events. Required if is_save is True. File will be saved in ROCSTORIES_DIR with a suffix based on df_type.
         """
+        if is_save and file_name is None:
+            # If is_save is True but file_name is not provided, raise an error
+            raise ValueError("file_name must be provided if is_save is True")
+        
         all_sentences = []
         story_indices = []  # To map each sentence back to its original story index in the DataFrame
 
@@ -202,6 +208,6 @@ class EventExtractor:
             events) for index, events in story_events.items()})
 
         if is_save:
-            output_path = f"{ROCSTORIES_DIR}/{df_type}_event.source_new.txt"
+            output_path = f"{ROCSTORIES_DIR}/{df_type}_{file_name}.txt"
             df['events'].to_csv(output_path, index=False, header=False)
             print(f"Events extracted and saved to {output_path}")
