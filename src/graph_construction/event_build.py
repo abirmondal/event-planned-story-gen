@@ -8,6 +8,7 @@ Each node represents an event with a frequency attribute, and each edge represen
 import pickle
 import pandas as pd
 import networkx as nx
+from typing import Union
 from tqdm.auto import tqdm
 import config.event_special_tokens as event_special_tokens
 import config.dir as dir
@@ -19,11 +20,17 @@ class EventGraphBuilder:
     Each edge represents a transition and can be weighted (e.g., by co-occurrence count).
     """
 
-    def __init__(self, graph: nx.DiGraph):
+    def __init__(self, graph_type: str = 'DiGraph'):
         """
         Initialize the EventGraphBuilder with an existing NetworkX DiGraph or creates a new one.
+
+        Args:
+            graph_type (str): Type of the graph to be created. Default is 'DiGraph'. Other options include 'Graph' for undirected graphs.
         """
-        self.graph = graph
+        if graph_type not in ['DiGraph', 'Graph']:
+            raise ValueError(f"Invalid graph type: {graph_type}. Choose 'DiGraph' or 'Graph'.")
+        
+        self.graph = nx.DiGraph() if graph_type == 'DiGraph' else nx.Graph()
 
     def build_graph(self, df: pd.DataFrame, event_col: str = None) -> None:
         """
@@ -77,6 +84,17 @@ class EventGraphBuilder:
                     else:
                         # Add a new edge with weight 1
                         self.graph.add_edge(prev_event, event, weight=1)
+
+    def get_graph(self) -> Union[nx.DiGraph, nx.Graph]:
+        """
+        Returns the constructed graph.
+
+        Returns:
+            nx.DiGraph or nx.Graph: The directed or undirected graph containing events as nodes and transitions as edges.
+        """
+        if self.graph.number_of_nodes() == 0:
+            raise ValueError("Graph is empty. Please build the graph first.")
+        return self.graph
 
     def save_graph_pickle(self, filename: str) -> None:
         """
