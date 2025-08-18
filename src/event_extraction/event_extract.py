@@ -25,7 +25,8 @@ class EventExtractor:
         """
         Initializes an EventExtractor instance.
 
-        :param nlp: The spaCy NLP model to be used for processing text.
+        Args:
+            nlp: The spaCy NLP model to be used for processing text.
         """
         self.nlp = nlp
 
@@ -33,9 +34,11 @@ class EventExtractor:
         """
         Extracts the trigger information from the spaCy Doc object.
 
-        :param doc: The spaCy Doc object containing the processed text.
+        Args:
+            doc: The spaCy Doc object containing the processed text.
 
-        :return: A tuple containing the trigger text and its index in the document.
+        Returns:
+            tuple: A tuple containing the trigger text and its index in the document.
         """
         for token in doc:
             if token.dep_ in event_tags.trigger_tags:
@@ -46,10 +49,12 @@ class EventExtractor:
         """
         Extracts the arguments related to the trigger from the spaCy Doc object.
 
-        :param doc: The spaCy Doc object containing the processed text.
-        :param trigger: The trigger word for which to find related arguments.
+        Args:
+            doc: The spaCy Doc object containing the processed text.
+            trigger: The trigger word for which to find related arguments.
 
-        :return: A tuple containing lists of modifiers, agents, and components related to the trigger.
+        Returns:
+            tuple: A tuple containing lists of modifiers, agents, and components related to the trigger.
         """
         modifiers = []
         agents = []
@@ -70,9 +75,11 @@ class EventExtractor:
         """
         Cleans the input text by removing special event tags.
 
-        :param text: The input text to be cleaned.
+        Args:
+            text: The input text to be cleaned.
 
-        :return: The cleaned text with special tags removed.
+        Returns:
+            str: The cleaned text with special tags removed.
         """
         for tag in event_special_tokens.CHAR_TAGS:
             text = text.replace(tag, "")
@@ -82,9 +89,11 @@ class EventExtractor:
         """
         Extract event information from the given text using the spaCy NLP model.
 
-        :param text: The input text from which to extract event information.
+        Args:
+            text: The input text from which to extract event information.
 
-        :return: An Event instance containing the extracted event information.
+        Returns:
+            Event:An Event instance containing the extracted event information.
         """
         text = self.__clear_special_tags_text(text)
 
@@ -110,9 +119,11 @@ class EventExtractor:
         """
         Extract events from the given story text.
 
-        :param story: The input story text from which to extract events.
+        Args:
+            story: The input story text from which to extract events.
 
-        :return: A list of Event instances extracted from the story.
+        Returns:
+            list: A list of Event instances extracted from the story.
         """
         story = self.__clear_special_tags_text(story)
 
@@ -144,6 +155,11 @@ class EventExtractor:
         return events
     
     def __format_events(self, events_list):
+        """
+        Formats a list of events into a string representation.
+
+        
+        """
         if not events_list:
             return ""  # Return empty string if no events were found for a story
         return (event_special_tokens.EVENT_START + " " +
@@ -154,11 +170,12 @@ class EventExtractor:
         """
         Extracts events from a DataFrame by processing all stories in a single, optimized batch.
 
-        :param df: A pandas DataFrame with a column 'target' containing story texts.
-        :param df_type: The type of DataFrame (e.g., 'train', 'test', 'val').
-        :param batch_size: The batch size for processing sentences with spaCy's nlp.pipe.
-        :param is_save: Whether to save the extracted events to a file.
-        :param file_name: The name of the file to save the extracted events. Required if is_save is True. File will be saved in ROCSTORIES_DIR with a suffix based on df_type.
+        Args:
+            df: A pandas DataFrame with a column 'target' containing story texts.
+            df_type: The type of DataFrame (e.g., 'train', 'test', 'val').
+            batch_size: The batch size for processing sentences with spaCy's nlp.pipe.
+            is_save: Whether to save the extracted events to a file.
+            file_name: The name of the file to save the extracted events. Required if is_save is True. File will be saved in ROCSTORIES_DIR with a suffix based on df_type.
         """
         if is_save and file_name is None:
             # If is_save is True but file_name is not provided, raise an error

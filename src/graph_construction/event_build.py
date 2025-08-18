@@ -28,6 +28,7 @@ class EventGraphBuilder:
     def build_graph(self, df: pd.DataFrame, event_col: str = None) -> None:
         """
         Forms the directed event graph from the DataFrame.
+        
         Args:
             df (pd.DataFrame): Input DataFrame. Must contain one column with event sequences.
             event_col (str): Name of the column containing event sequences. If None, uses the first column.
