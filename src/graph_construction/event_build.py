@@ -132,7 +132,7 @@ class EventGraphBuilder:
         
         # Load the graph from the pickle file
         with open(filepath, 'rb') as f:
-            self.graph = nx.pickle.load(f)
+            self.graph = pickle.load(f)
         print(f"Graph loaded from {filepath}.")
         return self.graph
     
