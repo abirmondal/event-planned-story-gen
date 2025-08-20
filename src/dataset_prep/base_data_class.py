@@ -8,9 +8,9 @@ import os
 import pandas as pd
 from config.dir import ROCSTORIES_DIR
 
-class BaseDataClass:
+class BaseDataClassDF:
     """
-    Base class for dataset preparation tasks.
+    Base class for dataset preparation tasks, using pandas DataFrame.
 
     This class provides a structure for handling dataset-related operations, including loading and processing data.
 
@@ -26,7 +26,7 @@ class BaseDataClass:
             data_cols: list = ['source', 'target'],
             ):
         """
-        Initializes the BaseDataClass with source, target, and event paths.
+        Initializes the BaseDataClassDF with source, target, and event paths.
 
         Args:
             source_filename_suffix (str): Suffix for the source filename (default: None).
