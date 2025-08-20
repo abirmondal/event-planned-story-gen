@@ -4,3 +4,4 @@ networkx
 tqdm
 spacy
 dotenv
+transformers
