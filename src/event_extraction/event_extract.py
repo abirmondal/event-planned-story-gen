@@ -154,11 +154,15 @@ class EventExtractor:
 
         return events
     
-    def __format_events(self, events_list):
+    def __format_events(self, events_list) -> str:
         """
         Formats a list of events into a string representation.
 
-        
+        Args:
+            events_list: A list of Event instances to be formatted.
+
+        Returns:
+            str: A string representation of the events, formatted with special tokens.
         """
         if not events_list:
             return ""  # Return empty string if no events were found for a story
@@ -197,11 +201,9 @@ class EventExtractor:
 
         
         # Process all sentences at once with nlp.pipe
-        # This is the main optimization. A large batch size is key.
-        # The tqdm progress bar now tracks the most time-consuming part.
+        # This is more efficient than processing each sentence individually.
         docs = self.nlp.pipe(all_sentences, batch_size=batch_size)
 
-        # --- Step 3: Reconstruct events and group them by original story ---
         # A dictionary to hold lists of events for each story index
         story_events = defaultdict(list)
         # zip lets us iterate through the processed docs and their original story indices together
