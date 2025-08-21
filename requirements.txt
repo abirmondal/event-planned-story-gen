@@ -5,3 +5,4 @@ tqdm
 spacy
 dotenv
 transformers
+datasets
