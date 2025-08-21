@@ -230,3 +230,49 @@ class EventExtractor:
             output_path = f"{ROCSTORIES_DIR}/{df_type}_{file_name}.txt"
             df['events'].to_csv(output_path, index=False, header=False)
             print(f"Events extracted and saved to {output_path}")
+
+
+def event_seq_to_list(event_seq: str) -> list:
+    """
+    Extracts a list of events from an event sequence string.
+
+    Args:
+        event_seq: A string containing a sequence of events, formatted with special tokens.
+
+    Returns:
+        list: A list of Event instances extracted from the event sequence.
+    """
+    events = []
+
+    # Split the event sequence by the event separator
+    event_seq = event_seq.replace(event_special_tokens.EVENT_START, "").replace(
+        event_special_tokens.EVENT_END, "")
+    event_parts = event_seq.split(event_special_tokens.EVENT_SEPERATOR)
+
+    for part in event_parts:
+        part = part.strip()
+        events.append(part)
+
+    return events if events else None
+
+
+def event_list_to_seq(event_list: list, is_end: bool = False, force_start: bool = False) -> str:
+    """
+    Converts a list of events into an event sequence string.
+
+    Args:
+        event_list: A list of Event instances to be converted.
+        is_end: A boolean indicating whether the sequence ends and event sequence end tokens should be included or not (default: False).
+        force_start: A boolean indicating whether to force the inclusion of the event start token (default: False). It is only done in case of empty event list.
+    
+    Returns:
+        str: A string representation of the event sequence, formatted with special tokens.
+    """
+    if not event_list:
+        if force_start:
+            return event_special_tokens.EVENT_START
+        else:
+            return ""  # Return empty string if no events were found
+    return (event_special_tokens.EVENT_START + " " +
+            (" " + event_special_tokens.EVENT_SEPERATOR + " ").join(str(event) for event in event_list) +
+            " " + (event_special_tokens.EVENT_END if is_end else event_special_tokens.EVENT_SEPERATOR))

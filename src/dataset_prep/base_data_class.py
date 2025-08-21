@@ -6,7 +6,7 @@ This module defines the BaseDataClass, which serves as a base class for dataset 
 
 import os
 import pandas as pd
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
 from config.dir import ROCSTORIES_DIR
 
 class BaseDataClassDF:
@@ -168,6 +168,7 @@ class BaseDataClassHF:
                 data['event'] = events
 
             self.dataset[data_type] = Dataset.from_dict(data)
+            self.dataset = DatasetDict(self.dataset)
             if show_data_size:
                 print(
                     f"Number of rows in {data_type} data: {self.dataset[data_type].num_rows}")

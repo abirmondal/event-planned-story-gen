@@ -4,9 +4,11 @@
 This module defines the DataForTrain class, which extends BaseDataClassDF for dataset preparation tasks specific to training data.
 """
 
-from datasets import Dataset
+from tqdm.auto import tqdm
+from datasets import Dataset, DatasetDict
 from src.dataset_prep.base_data_class import BaseDataClassHF
 from config.dir import ROCSTORIES_DIR
+from src.event_extraction.event_extract import event_seq_to_list, event_list_to_seq
 
 class DataForTrain(BaseDataClassHF):
     """
@@ -44,6 +46,8 @@ class DataForTrain(BaseDataClassHF):
         Prepares the dataset for event generation from leading context.
 
         This method loads the data and returns Hugging Face Dataset object with only source and event columns.
+        Each event sequence is broken down into individual events, which are concatenated with special tokens.
+        For predicting each event, the source is the leading context + the previous events, and the target is the next event.
 
         Returns:
             Dataset: A Hugging Face Dataset object containing the prepared data.
@@ -51,9 +55,44 @@ class DataForTrain(BaseDataClassHF):
         self.load_data(event_read=True)
 
         # Filter the dataset to include only the 'source' and 'event' columns
-        training_dataset = {
+        dataset_source_event = {
             data_type: self.dataset[data_type].select_columns(['source', 'event'])
             for data_type in self.data_types
         }
+
+        # Convert the dataset to a DatasetDict
+        dataset_source_event = DatasetDict(dataset_source_event)
+        training_dataset = {}
+
+        # Process each data type to prepare the source and event columns
+        for data_type in self.data_types:
+            data = dataset_source_event[data_type]
+            source = data['source']
+            event = data['event']
+            sources = []
+            events = []
+
+            # Extract individual events from the event sequences
+            for i, event_sequence in tqdm(enumerate(event), desc=f"Processing {data_type} data", total=len(event)):
+                event_sequence = event_seq_to_list(event_sequence)
+
+                if not event_sequence:
+                    continue
+                for j, event in enumerate(event_sequence):
+                    if j == len(event_sequence) - 1:
+                        sources.append(
+                            f"{source[i]} {event_list_to_seq(event_sequence[:j], is_end=True, force_start=True)}")
+                    else:
+                        sources.append(
+                            f"{source[i]} {event_list_to_seq(event_sequence[:j], is_end=False, force_start=True)}")
+                    events.append(event)
+            
+            training_dataset[data_type] = Dataset.from_dict({
+                'source': sources,
+                'event': events,
+            })
+
+        # Convert the training dataset to a DatasetDict
+        training_dataset = DatasetDict(training_dataset)
 
         return training_dataset
