@@ -1,8 +1,13 @@
-pandas
-numpy
-networkx
-tqdm
-spacy
-dotenv
-transformers
-datasets
+pandas       # For data manipulation and analysis (less used)
+numpy        # For numerical computations (less used)
+networkx     # For graph operations
+tqdm         # For progress bar
+spacy        # For natural language processing
+dotenv       # For environment variable management
+transformers # For natural language processing and model handling
+datasets     # For handling datasets
+wandb        # For logging and tracking experiments
+evaluate     # For model evaluation
+rouge_score  # For ROUGE evaluation
+sacrebleu    # For BLEU evaluation
+nltk         # For natural language processing
