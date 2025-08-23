@@ -8,6 +8,7 @@ from tqdm.auto import tqdm
 from datasets import Dataset, DatasetDict
 from src.dataset_prep.base_data_class import BaseDataClassHF
 from src.event_extraction.event_extract import event_seq_to_list, event_list_to_seq
+from config.event_special_tokens import EVENT_END
 
 class DataForTrain(BaseDataClassHF):
     """
@@ -21,7 +22,7 @@ class DataForTrain(BaseDataClassHF):
             source_filename_suffix: str = None,
             target_filename_suffix: str = None,
             event_filename_suffix: str = None,
-            data_types: list = ['train', 'test', 'val'],
+            data_types: list = ['train', 'val'],
             data_cols: list = ['source', 'target'],
             ):
         """
@@ -79,12 +80,8 @@ class DataForTrain(BaseDataClassHF):
                     continue
                 for j, event in enumerate(event_sequence):
                     sources.append(
-                        f"{source[i]} {event_list_to_seq(event_sequence[:j], is_end=False, force_start=True)}")
-                    events.append(event)
-                end_sequence = event_list_to_seq(
-                    event_sequence, is_end=True, force_start=True).rsplit(' ', 1)
-                sources.append(f"{source[i]} {end_sequence[0]}")
-                events.append(end_sequence[1])
+                        f"{source[i]} {event_list_to_seq(event_sequence[:j], is_end=True, force_start=True)}")
+                    events.append(event + " " + EVENT_END)
 
             training_dataset[data_type] = Dataset.from_dict({
                 'source': sources,
