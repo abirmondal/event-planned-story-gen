@@ -95,8 +95,6 @@ class EventExtractor:
         Returns:
             Event:An Event instance containing the extracted event information.
         """
-        text = self.__clear_special_tags_text(text)
-
         doc = self.nlp(text)
 
         trigger_info = self.__get_trigger_info(doc)
@@ -125,7 +123,6 @@ class EventExtractor:
         Returns:
             list: A list of Event instances extracted from the story.
         """
-        story = self.__clear_special_tags_text(story)
 
         events = []
         # Split by sentence-ending punctuation
@@ -190,7 +187,6 @@ class EventExtractor:
 
         # Flatten all stories into a single list of sentences
         for index, story in df['target'].items():
-            story = self.__clear_special_tags_text(story)
             sentences = [s.strip() for s in re.split(
                 r'(?<=[.!?]) +', story) if s.strip()]
 
