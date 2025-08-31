@@ -70,6 +70,18 @@ class EventExtractor:
                     comps.append((token.text, token.i))
 
         return modifiers, agents, comps
+    
+    def __clear_brackets(self, text: str) -> str:
+        """
+        Cleans the input text by removing brackets.
+
+        Args:
+            text: The input text to be cleaned.
+
+        Returns:
+            str: The cleaned text with brackets removed.
+        """
+        return re.sub(r'[\[\]\(\)]', '', text).strip()
 
     def __clear_special_tags_text(self, text: str) -> str:
         """
@@ -95,6 +107,7 @@ class EventExtractor:
         Returns:
             Event:An Event instance containing the extracted event information.
         """
+        text = self.__clear_brackets(text)
         doc = self.nlp(text)
 
         trigger_info = self.__get_trigger_info(doc)
@@ -129,10 +142,10 @@ class EventExtractor:
         sentences = re.split(r'(?<=[.!?]) +', story)
         sentences = [s.strip() for s in sentences if s.strip()
                      ]  # Remove empty sentences
+        sentences = [self.__clear_brackets(s) for s in sentences]
 
-        docs = self.nlp.pipe(sentences, batch_size=4)
-
-        for doc in docs:
+        for sentence in sentences:
+            doc = self.nlp(sentence)
             trigger_info = self.__get_trigger_info(doc)
             if trigger_info:
                 trigger = trigger_info[0]
@@ -189,6 +202,7 @@ class EventExtractor:
         for index, story in df['target'].items():
             sentences = [s.strip() for s in re.split(
                 r'(?<=[.!?]) +', story) if s.strip()]
+            sentences = [self.__clear_brackets(s) for s in sentences]
 
             # Add the sentences to our master list
             all_sentences.extend(sentences)
@@ -225,6 +239,36 @@ class EventExtractor:
         if is_save:
             output_path = f"{ROCSTORIES_DIR}/{df_type}_{file_name}.txt"
             df['events'].to_csv(output_path, index=False, header=False)
+            print(f"Events extracted and saved to {output_path}")
+
+    def extract_events_from_story_df_no_batch(self, df: pd.DataFrame, df_type: str, is_save: bool = True, file_name: str = None):
+        """
+        Extracts events from a DataFrame by processing each story individually.
+        The inferencing will run on CPU only. This is done to avoid event extraction inconsistencies.
+
+        Args:
+            df: A pandas DataFrame with a column 'target' containing story texts.
+            df_type: The type of DataFrame (e.g., 'train', 'test', 'val').
+            is_save: Whether to save the extracted events to a file.
+            file_name: The name of the file to save the extracted events. Required if is_save is True. File will be saved in ROCSTORIES_DIR with a suffix based on df_type.
+        """
+        if is_save and file_name is None:
+            # If is_save is True but file_name is not provided, raise an error
+            raise ValueError("file_name must be provided if is_save is True")
+
+        all_events = []
+
+        for index, story in tqdm(df['target'].items(), total=len(df), desc=f"Extracting events from {df_type} data (without batching)"):
+            events = self.extract_events_from_story(story)
+            story_events = self.__format_events(events)
+            all_events.append(story_events)
+
+        # Create a new DataFrame to hold the extracted events
+        events_df = pd.DataFrame(all_events)
+
+        if is_save:
+            output_path = f"{ROCSTORIES_DIR}/{df_type}_{file_name}.txt"
+            events_df.to_csv(output_path, index=False, header=False)
             print(f"Events extracted and saved to {output_path}")
 
 
