@@ -29,7 +29,7 @@ def update_directories(base_dir: str):
     Args:
         base_dir (str): The base directory path.
     """
-    global BASE_DIR, DATA_DIR, ROCSTORIES_DIR, PROCESSED_DATA_DIR, RAW_DATA_DIR, GRAPH_DATA_DIR
+    global BASE_DIR, DATA_DIR, ROCSTORIES_DIR, PROCESSED_DATA_DIR, RAW_DATA_DIR, GRAPH_DATA_DIR, EVENT_GRAPH_MAP_DIR
     BASE_DIR = Path(base_dir).resolve()
     DATA_DIR = BASE_DIR / "data"
     ROCSTORIES_DIR = DATA_DIR / "processed" / "rocstories_name_replaced"
