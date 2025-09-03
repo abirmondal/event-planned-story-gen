@@ -81,7 +81,6 @@ def events_map_to_best_graph_events(events: list, events_list: list, return_scor
         graph_maps = [get_best_event_from_graph_nodes(event, events_list, return_score) for event in tqdm(
             events, desc="Mapping events to graph events", leave=tqdm_leave)]
     return graph_maps
-    return graph_maps
 
 
 def calculate_metrics_for_events(
