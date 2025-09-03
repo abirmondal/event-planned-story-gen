@@ -57,7 +57,7 @@ def get_best_event_from_graph_nodes(test_event: str, events_list: list, return_s
         return {"event": max_similarity_event[0], "score": max_similarity_event[1]}
     return {"event": max_similarity_event[0]}
 
-def events_map_to_best_graph_events(events: list, events_list: list, return_score: bool = False, cpu_parallel: bool = False, cpu_n_jobs: int = -1) -> list:
+def events_map_to_best_graph_events(events: list, events_list: list, return_score: bool = False, cpu_parallel: bool = False, cpu_n_jobs: int = -1, tqdm_leave: bool = True) -> list:
     """
     Map a list of events to the closest events in the graph using Jaccard similarity.
 
@@ -67,6 +67,7 @@ def events_map_to_best_graph_events(events: list, events_list: list, return_scor
         return_score (bool): Whether to return the similarity score along with the event.
         cpu_parallel (bool): Whether to use parallel processing on CPU.
         cpu_n_jobs (int): Number of CPU jobs to use for parallel processing. Default is -1 (use all available cores).
+        tqdm_leave (bool): Whether to leave the tqdm progress bar. Default is True.
 
     Returns:
         list: A list of mapped events from the graph.
@@ -74,12 +75,12 @@ def events_map_to_best_graph_events(events: list, events_list: list, return_scor
     if cpu_parallel:
         graph_maps = Parallel(n_jobs=cpu_n_jobs, backend="multiprocessing")(
             delayed(get_best_event_from_graph_nodes)(event, events_list, return_score)
-            for event in tqdm(events, desc="Mapping events to graph events")
+            for event in tqdm(events, desc="Mapping events to graph events", leave=tqdm_leave)
         )
     else:
         graph_maps = [get_best_event_from_graph_nodes(event, events_list, return_score) for event in tqdm(
-            events, desc="Mapping events to graph events")]
-    
+            events, desc="Mapping events to graph events", leave=tqdm_leave)]
+    return graph_maps
     return graph_maps
 
 
