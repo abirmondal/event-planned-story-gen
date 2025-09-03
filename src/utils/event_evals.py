@@ -83,15 +83,15 @@ def events_map_to_best_graph_events(events: list, events_list: list, return_scor
     return graph_maps
 
 
-def calculate_metrics_for_events(tokenizer: AutoTokenizer, event_list: list, metrics_prefix: str, use_graph_events: bool = False, cpu_parallel: bool = False, cpu_n_jobs: int = -1, save_graph_map: bool = False, save_graph_map_file_name: str = "") -> callable:
+def calculate_metrics_for_events(tokenizer: AutoTokenizer, metrics_prefix: str, use_graph_events: bool = False, event_list: list = None,  cpu_parallel: bool = False, cpu_n_jobs: int = -1, save_graph_map: bool = False, save_graph_map_file_name: str = "") -> callable:
     """
     Create a function to compute evaluation metrics for a batch of predictions and labels.
 
     Args:
         tokenizer: The tokenizer used to decode token IDs to text.
-        event_list (list): A list of events from the graph for comparison.
         metrics_prefix (str): A prefix to add to the metric names.
         use_graph_events (bool): Whether to map predicted events to the closest event in the graph.
+        event_list (list): A list of events from the graph for comparison. Required if use_graph_events is True.
         cpu_parallel (bool): Whether to use parallel processing on CPU.
         cpu_n_jobs (int): Number of CPU jobs to use for parallel processing. Default is -1 (use all available cores).
         save_graph_map (bool): Whether to save the graph mapping results to a file.
@@ -102,6 +102,9 @@ def calculate_metrics_for_events(tokenizer: AutoTokenizer, event_list: list, met
     """
     if save_graph_map_file_name == "" and save_graph_map:
         save_graph_map_file_name = "graph_mapped_events.csv"
+        
+    if use_graph_events and event_list is None:
+        raise ValueError("event_list must be provided when use_graph_events is True")
     def computer_metrics(pred_events):
         """
         Compute evaluation metrics for a batch of predictions and labels.
