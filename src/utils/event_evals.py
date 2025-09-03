@@ -83,7 +83,18 @@ def events_map_to_best_graph_events(events: list, events_list: list, return_scor
     return graph_maps
 
 
-def calculate_metrics_for_events(tokenizer: AutoTokenizer, metrics_prefix: str = "", use_graph_events: bool = False, event_list: list = None,  cpu_parallel: bool = False, cpu_n_jobs: int = -1, save_graph_map: bool = False, save_graph_map_file_name: str = "") -> callable:
+def calculate_metrics_for_events(
+        tokenizer: AutoTokenizer,
+        metrics_prefix: str = "",
+        use_graph_events: bool = False,
+        event_list: list = None,
+        cpu_parallel: bool = False,
+        cpu_n_jobs: int = -1,
+        save_graph_map: bool = False,
+        save_graph_map_file_name: str = "",
+        save_preds: bool = False,
+        save_preds_file_name: str = ""
+) -> callable:
     """
     Create a function to compute evaluation metrics for a batch of predictions and labels.
 
@@ -102,6 +113,9 @@ def calculate_metrics_for_events(tokenizer: AutoTokenizer, metrics_prefix: str =
     """
     if save_graph_map_file_name == "" and save_graph_map:
         save_graph_map_file_name = "graph_mapped_events.csv"
+
+    if save_preds_file_name == "" and save_preds:
+        save_preds_file_name = "preds.csv"
 
     if use_graph_events and event_list is None:
         raise ValueError("event_list must be provided when use_graph_events is True")
@@ -156,7 +170,16 @@ def calculate_metrics_for_events(tokenizer: AutoTokenizer, metrics_prefix: str =
 
             # Replace the decoded predictions with the mapped events
             decoded_preds = [graph_map["event"] for graph_map in graph_maps]
-                
+        
+        if save_preds:
+            data = {
+                "original_event": decoded_preds,
+                "true_event": decoded_labels
+            }
+            df = pd.DataFrame(data)
+            df.to_csv(EVENT_GRAPH_MAP_DIR / save_preds_file_name, index=False)
+            # Delete the dataframe to free up memory
+            del df
 
         # Calculate ROUGE scores
         result = rouge.compute(predictions=decoded_preds,
