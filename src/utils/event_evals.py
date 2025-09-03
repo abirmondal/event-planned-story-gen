@@ -114,6 +114,9 @@ def calculate_metrics_for_events(
     if save_graph_map_file_name == "" and save_graph_map:
         save_graph_map_file_name = "graph_mapped_events.csv"
 
+    if save_preds:
+        if not EVENT_GRAPH_MAP_DIR.exists():
+            EVENT_GRAPH_MAP_DIR.mkdir(parents=True, exist_ok=True)
     if save_preds_file_name == "" and save_preds:
         save_preds_file_name = "preds.csv"
 
