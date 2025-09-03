@@ -83,13 +83,13 @@ def events_map_to_best_graph_events(events: list, events_list: list, return_scor
     return graph_maps
 
 
-def calculate_metrics_for_events(tokenizer: AutoTokenizer, metrics_prefix: str, use_graph_events: bool = False, event_list: list = None,  cpu_parallel: bool = False, cpu_n_jobs: int = -1, save_graph_map: bool = False, save_graph_map_file_name: str = "") -> callable:
+def calculate_metrics_for_events(tokenizer: AutoTokenizer, metrics_prefix: str = "", use_graph_events: bool = False, event_list: list = None,  cpu_parallel: bool = False, cpu_n_jobs: int = -1, save_graph_map: bool = False, save_graph_map_file_name: str = "") -> callable:
     """
     Create a function to compute evaluation metrics for a batch of predictions and labels.
 
     Args:
         tokenizer: The tokenizer used to decode token IDs to text.
-        metrics_prefix (str): A prefix to add to the metric names.
+        metrics_prefix (str): A prefix to add to the metric names. Default is an empty string.
         use_graph_events (bool): Whether to map predicted events to the closest event in the graph.
         event_list (list): A list of events from the graph for comparison. Required if use_graph_events is True.
         cpu_parallel (bool): Whether to use parallel processing on CPU.
@@ -102,9 +102,13 @@ def calculate_metrics_for_events(tokenizer: AutoTokenizer, metrics_prefix: str, 
     """
     if save_graph_map_file_name == "" and save_graph_map:
         save_graph_map_file_name = "graph_mapped_events.csv"
-        
+
     if use_graph_events and event_list is None:
         raise ValueError("event_list must be provided when use_graph_events is True")
+
+    if metrics_prefix:
+        metrics_prefix = metrics_prefix + "/"
+
     def computer_metrics(pred_events):
         """
         Compute evaluation metrics for a batch of predictions and labels.
@@ -157,15 +161,15 @@ def calculate_metrics_for_events(tokenizer: AutoTokenizer, metrics_prefix: str, 
         # Calculate ROUGE scores
         result = rouge.compute(predictions=decoded_preds,
                                references=decoded_labels, use_stemmer=True)
-        result = {f"{metrics_prefix}/{key}": value for key,
+        result = {f"{metrics_prefix}{key}": value for key,
                   value in result.items()}
 
         # Calculate BLEU score
-        result[f"{metrics_prefix}/bleu"] = bleu.compute(
+        result[f"{metrics_prefix}bleu"] = bleu.compute(
             predictions=decoded_preds, references=[[label] for label in decoded_labels])["bleu"]
 
         # Calculate the average length of the generated events
-        result[f"{metrics_prefix}/gen_len"] = np.mean([np.count_nonzero(pred != tokenizer.pad_token_id) for pred in prediction])
+        result[f"{metrics_prefix}gen_len"] = np.mean([np.count_nonzero(pred != tokenizer.pad_token_id) for pred in prediction])
 
         return result
 
