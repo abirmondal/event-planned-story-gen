@@ -19,6 +19,8 @@ PROCESSED_DATA_DIR = DATA_DIR / "processed"
 RAW_DATA_DIR = DATA_DIR / "raw"
 # Directory for graph data files
 GRAPH_DIR = DATA_DIR / "graph"
+# Directory for event graph mapping files
+EVENT_GRAPH_MAP_DIR = DATA_DIR / "event_graph_map"
 
 def update_directories(base_dir: str):
     """
@@ -34,3 +36,4 @@ def update_directories(base_dir: str):
     PROCESSED_DATA_DIR = DATA_DIR / "processed"
     RAW_DATA_DIR = DATA_DIR / "raw"
     GRAPH_DATA_DIR = DATA_DIR / "graph"
+    EVENT_GRAPH_MAP_DIR = DATA_DIR / "event_graph_map"

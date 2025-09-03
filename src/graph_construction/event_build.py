@@ -117,12 +117,16 @@ class EventGraphBuilder:
             pickle.dump(self.graph, f, protocol=pickle.HIGHEST_PROTOCOL)
         print(f"Graph saved to {filepath}.")
 
-    def load_graph_pickle(self, filename: str) -> nx.DiGraph:
+    def load_graph_pickle(self, filename: str, load_message: bool = True) -> nx.DiGraph:
         """
         Loads a graph from a pickle file using networkx.read_gpickle.
 
         Args:
             filename (str): The input file name from which the graph will be loaded.
+            load_message (bool): Whether to print a message after loading the graph. Default is True.
+
+        Returns:
+            nx.DiGraph or nx.Graph: The loaded directed or undirected graph.
         """
         filepath = dir.GRAPH_DIR / filename
         if not filepath.exists():
@@ -133,7 +137,10 @@ class EventGraphBuilder:
         # Load the graph from the pickle file
         with open(filepath, 'rb') as f:
             self.graph = pickle.load(f)
-        print(f"Graph loaded from {filepath}.")
+            
+        if load_message:
+            print(f"Graph loaded from {filepath}.")
+        
         return self.graph
     
     def save_graph_gexf(self, filename: str) -> None:
@@ -156,12 +163,16 @@ class EventGraphBuilder:
         nx.write_gexf(self.graph, filepath)
         print(f"Graph saved to {filepath}.")
 
-    def load_graph_gexf(self, filename: str) -> nx.DiGraph:
+    def load_graph_gexf(self, filename: str, load_message: bool = True) -> nx.DiGraph:
         """
         Loads a graph from a GEXF file using networkx.read_gexf.
 
         Args:
             filename (str): The input file name from which the graph will be loaded.
+            load_message (bool): Whether to print a message after loading the graph. Default is True.
+
+        Returns:
+            nx.DiGraph or nx.Graph: The loaded directed or undirected graph.
         """
         filepath = dir.GRAPH_DIR / filename
         if not filepath.exists():
@@ -169,5 +180,8 @@ class EventGraphBuilder:
         if not filepath.suffix == '.gexf':
             raise ValueError("File must be a .gexf file.")
         self.graph = nx.read_gexf(filepath)
-        print(f"Graph loaded from {filepath}.")
+        
+        if load_message:
+            print(f"Graph loaded from {filepath}.")
+        
         return self.graph
