@@ -9,6 +9,7 @@ event-story-generation/
 │   ├── processed/              # Processed event data
 │   └── graphs/                 # Saved event graphs
 ├── src/
+│   ├── dataset_prep/           # Data pre-process modules
 │   ├── event_extraction/       # Event extraction modules
 │   ├── event_planning/         # Event sequence generation (NOT IMPLEMENTED)
 │   ├── graph_construction/     # Event graph building
